@@ -8,6 +8,9 @@
 			"pipelineReference": {
 				"referenceName": "copy chicken data",
 				"type": "PipelineReference"
+			},
+			"parameters": {
+				"windowStart": "2025-06-03 10:00:00"
 			}
 		},
 		"type": "TumblingWindowTrigger",
