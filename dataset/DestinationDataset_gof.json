@@ -1,0 +1,20 @@
+{
+	"name": "DestinationDataset_gof",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "nju2usynanajun25-WorkspaceDefaultStorage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "STAGING/babs/trips",
+				"fileSystem": "synapsefs"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
