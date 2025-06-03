@@ -1,0 +1,77 @@
+{
+	"name": "demodataflow",
+	"properties": {
+		"description": "demo",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SourceDataset_gof",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "nju2usynanajun25-WorkspaceDefaultStorage",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Trip ID} as integer,",
+				"          Duration as short,",
+				"          {Start Date} as timestamp 'MM/dd/yyyy HH:mm',",
+				"          {Start Station} as string,",
+				"          {Start Terminal} as short,",
+				"          {End Date} as timestamp 'MM/dd/yyyy HH:mm',",
+				"          {End Station} as string,",
+				"          {End Terminal} as short,",
+				"          {Bike #} as short,",
+				"          {Subscriber Type} as string,",
+				"          {Zip Code} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     limit: 100,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 split({End Terminal}<60,",
+				"     disjoint: false) ~> split1@(lowEndStation, highendstation)",
+				"split1@lowEndStation aggregate(groupBy({Start Station}),",
+				"     tripcount = count({Start Terminal})) ~> aggregate1",
+				"aggregate1 select(mapColumn(",
+				"          StartStation = {Start Station},",
+				"          tripcount",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     fileSystem: 'synapsefs',",
+				"     folderPath: 'STAGING/babs/stationcount',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}
