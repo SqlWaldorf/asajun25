@@ -1,0 +1,26 @@
+{
+	"name": "hourly",
+	"properties": {
+		"description": "jhh",
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipeline": {
+			"pipelineReference": {
+				"referenceName": "copy chicken data",
+				"type": "PipelineReference"
+			}
+		},
+		"type": "TumblingWindowTrigger",
+		"typeProperties": {
+			"frequency": "Hour",
+			"interval": 1,
+			"startTime": "2025-06-03T09:59:00Z",
+			"delay": "00:00:00",
+			"maxConcurrency": 50,
+			"retryPolicy": {
+				"intervalInSeconds": 30
+			},
+			"dependsOn": []
+		}
+	}
+}
