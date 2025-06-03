@@ -51,6 +51,68 @@
 					"validateDataConsistency": false,
 					"translator": {
 						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "rownum",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "rownum",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "weight",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "weight",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Time",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Time",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Chick",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Chick",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							},
+							{
+								"source": {
+									"name": "Diet",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Diet",
+									"type": "String",
+									"physicalType": "UTF8"
+								}
+							}
+						],
 						"typeConversion": true,
 						"typeConversionSettings": {
 							"allowDataTruncation": true,
