@@ -19,6 +19,9 @@
 		},
 		"nju2usynanajun25-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://nju2udlg2jun25.dfs.core.windows.net"
+		},
+		"hourly_properties_pipeline_parameters_windowStart": {
+			"value": "2025-06-03 10:00:00"
 		}
 	}
 }

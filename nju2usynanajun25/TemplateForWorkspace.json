@@ -27,6 +27,10 @@
 		"nju2usynanajun25-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://nju2udlg2jun25.dfs.core.windows.net"
+		},
+		"hourly_properties_pipeline_parameters_windowStart": {
+			"type": "string",
+			"defaultValue": "2025-06-03 10:00:00"
 		}
 	},
 	"variables": {
@@ -411,6 +415,40 @@
 				"type": "SqlQuery"
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/hourly')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "jhh",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "copy chicken data",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"windowStart": "[parameters('hourly_properties_pipeline_parameters_windowStart')]"
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Hour",
+					"interval": 1,
+					"startTime": "2025-06-03T09:59:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/copy chicken data')]"
+			]
 		}
 	]
 }
