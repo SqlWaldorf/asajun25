@@ -1,0 +1,46 @@
+{
+	"name": "SourceDataset_vfj",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "chickweight.csv",
+				"folderPath": "monday",
+				"container": "demodata"
+			},
+			"columnDelimiter": ",",
+			"rowDelimiter": "\n",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "rownum",
+				"type": "String"
+			},
+			{
+				"name": "weight",
+				"type": "String"
+			},
+			{
+				"name": "Time",
+				"type": "String"
+			},
+			{
+				"name": "Chick",
+				"type": "String"
+			},
+			{
+				"name": "Diet",
+				"type": "String"
+			}
+		]
+	}
+}
