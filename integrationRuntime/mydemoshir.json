@@ -1,0 +1,7 @@
+{
+	"name": "mydemoshir",
+	"properties": {
+		"type": "SelfHosted",
+		"description": "demo"
+	}
+}
