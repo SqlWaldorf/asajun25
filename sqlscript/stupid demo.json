@@ -1,0 +1,17 @@
+{
+	"name": "stupid demo",
+	"properties": {
+		"content": {
+			"query": "create view myfavoritenumber as select 42 as answer\n\nselect * from sys.views\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "myserverlessdemo",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
