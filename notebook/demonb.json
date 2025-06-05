@@ -1,0 +1,190 @@
+{
+	"name": "demonb",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "demopool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "b8f09073-3d64-4794-aa38-f3c060444d4c"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/56f50f90-f8ef-4179-9146-b3fdf441cfd6/resourceGroups/jun25ASA/providers/Microsoft.Synapse/workspaces/nju2usynanajun25/bigDataPools/demopool",
+				"name": "demopool",
+				"type": "Spark",
+				"endpoint": "https://nju2usynanajun25.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/demopool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Demo notebook\n",
+					"\n",
+					"This is a **stupid** demo\n",
+					"\n",
+					"$$\\sum_{i=0}^{10} i^2$$"
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## simple math"
+				]
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"1+1"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"## a bit of SQL"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\n",
+					"SELECT 1 +1"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"ms_comments": [
+						{
+							"threadId": "9f15c245-2b67-4861-a7dd-86fc5d610702",
+							"text": "what is this?",
+							"status": "active",
+							"user": {
+								"name": "Nico Jacobs",
+								"idType": "aad"
+							},
+							"createdDateUTC": 1749133393268,
+							"modifiedDateUTC": 1749133393268,
+							"replies": [
+								{
+									"replyId": "06debb1d-da53-405b-b300-fef96a1af067",
+									"text": "you must grab this from",
+									"user": {
+										"name": "Nico Jacobs",
+										"idType": "aad"
+									},
+									"createdDateUTC": 1749133416488,
+									"modifiedDateUTC": 1749133416488
+								}
+							]
+						}
+					],
+					"ms_comment_ranges": {
+						"9f15c245-2b67-4861-a7dd-86fc5d610702": {
+							"text": "our linked service name",
+							"start": {
+								"line": 8,
+								"column": 25
+							},
+							"end": {
+								"line": 8,
+								"column": 48
+							}
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql import SparkSession \n",
+					"from pyspark.sql.types import * \n",
+					"        \n",
+					"# Azure storage access info \n",
+					"blob_account_name = 'Your blob name' # replace with your blob name \n",
+					"blob_container_name = 'Your container name' # replace with your container name \n",
+					"blob_relative_path = 'Your relative path' # replace with your relative folder path \n",
+					"linked_service_name = 'Your linked service name' # replace with your linked service name \n",
+					"        \n",
+					"blob_sas_token = mssparkutils.credentials.getConnectionStringOrCreds(linked_service_name) \n",
+					"        \n",
+					"# Allow SPARK to access from Blob remotely \n",
+					"wasbs_path = 'wasbs://%s@%s.blob.core.windows.net/%s' % (blob_container_name, blob_account_name, blob_relative_path) \n",
+					"spark.conf.set('fs.azure.sas.%s.%s.blob.core.windows.net' % (blob_container_name, blob_account_name), blob_sas_token) \n",
+					"print('Remote blob path: ' + wasbs_path) \n",
+					"        \n",
+					"# Read a csv file \n",
+					"csv_path = wasbs_path + 'Your file name ' \n",
+					"df_csv = spark.read.csv(csv_path, header = 'true') \n",
+					"        \n",
+					"# Read a parquet file \n",
+					"parquet_path = wasbs_path + ' Your file name ' \n",
+					"df_parquet = spark.read.parquet(parquet_path) \n",
+					"        \n",
+					"# Read a json file \n",
+					"json_path = wasbs_path + 'Your file name ' \n",
+					"df_json = spark.read.json(json_path) "
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
