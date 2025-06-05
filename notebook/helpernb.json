@@ -1,0 +1,68 @@
+{
+	"name": "helpernb",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "demopool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "bd178769-1471-42ad-a4fb-1486d6740b10"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/56f50f90-f8ef-4179-9146-b3fdf441cfd6/resourceGroups/jun25ASA/providers/Microsoft.Synapse/workspaces/nju2usynanajun25/bigDataPools/demopool",
+				"name": "demopool",
+				"type": "Spark",
+				"endpoint": "https://nju2usynanajun25.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/demopool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.4",
+				"nodeCount": 3,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"myfavnr = 42"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def somemath(i,j):\n",
+					"    return i+j"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
