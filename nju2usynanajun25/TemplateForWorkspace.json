@@ -38,6 +38,85 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('workspaceName'), '/mydemopool')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/demopool')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyPipeline_gof')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Metadata1",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "SourceDataset_gof",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"lastModified",
+								"size",
+								"structure"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"parallelruns": {
+						"type": "int",
+						"defaultValue": 4
+					}
+				},
+				"variables": {
+					"parallelism": {
+						"type": "Integer",
+						"defaultValue": 12
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/SourceDataset_gof')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/copy chicken data')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -195,6 +274,77 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/etldemo')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "demodataflow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/demodataflow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DestinationDataset_gof')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "nju2usynanajun25-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "STAGING/babs/trips",
+						"fileSystem": "synapsefs"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/nju2usynanajun25-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/DestinationDataset_vfj')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -225,6 +375,79 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/nju2usynanajun25-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SourceDataset_gof')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "201508_trip_data.csv",
+						"container": "demodata"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Trip ID",
+						"type": "String"
+					},
+					{
+						"name": "Duration",
+						"type": "String"
+					},
+					{
+						"name": "Start Date",
+						"type": "String"
+					},
+					{
+						"name": "Start Station",
+						"type": "String"
+					},
+					{
+						"name": "Start Terminal",
+						"type": "String"
+					},
+					{
+						"name": "End Date",
+						"type": "String"
+					},
+					{
+						"name": "End Station",
+						"type": "String"
+					},
+					{
+						"name": "End Terminal",
+						"type": "String"
+					},
+					{
+						"name": "Bike #",
+						"type": "String"
+					},
+					{
+						"name": "Subscriber Type",
+						"type": "String"
+					},
+					{
+						"name": "Zip Code",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
@@ -367,6 +590,40 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/hourly')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "jhh",
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "copy chicken data",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"windowStart": "[parameters('hourly_properties_pipeline_parameters_windowStart')]"
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Hour",
+					"interval": 1,
+					"startTime": "2025-06-03T09:59:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/copy chicken data')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
 			"apiVersion": "2019-06-01-preview",
@@ -384,6 +641,99 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/mydemoshir')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "SelfHosted",
+				"description": "demo",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/demodataflow')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "demo",
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SourceDataset_gof",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"linkedService": {
+								"referenceName": "nju2usynanajun25-WorkspaceDefaultStorage",
+								"type": "LinkedServiceReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "split1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {Trip ID} as integer,",
+						"          Duration as short,",
+						"          {Start Date} as timestamp 'MM/dd/yyyy HH:mm',",
+						"          {Start Station} as string,",
+						"          {Start Terminal} as short,",
+						"          {End Date} as timestamp 'MM/dd/yyyy HH:mm',",
+						"          {End Station} as string,",
+						"          {End Terminal} as short,",
+						"          {Bike #} as short,",
+						"          {Subscriber Type} as string,",
+						"          {Zip Code} as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 split({End Terminal}<60,",
+						"     disjoint: false) ~> split1@(lowEndStation, highendstation)",
+						"split1@lowEndStation aggregate(groupBy({Start Station}),",
+						"     tripcount = count({Start Terminal})) ~> aggregate1",
+						"aggregate1 select(mapColumn(",
+						"          StartStation = {Start Station},",
+						"          tripcount",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     fileSystem: 'synapsefs',",
+						"     folderPath: 'STAGING/babs/stationcount',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/SourceDataset_gof')]",
+				"[concat(variables('workspaceId'), '/linkedServices/nju2usynanajun25-WorkspaceDefaultStorage')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
@@ -417,38 +767,328 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/hourly')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
+			"name": "[concat(parameters('workspaceName'), '/stupid demo')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"description": "jhh",
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipeline": {
-					"pipelineReference": {
-						"referenceName": "copy chicken data",
-						"type": "PipelineReference"
+				"content": {
+					"query": "create view myfavoritenumber as select 42 as answer\n\nselect * from sys.views\n",
+					"metadata": {
+						"language": "sql"
 					},
-					"parameters": {
-						"windowStart": "[parameters('hourly_properties_pipeline_parameters_windowStart')]"
+					"currentConnection": {
+						"databaseName": "myserverlessdemo",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/demonb')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "demopool",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "b8f09073-3d64-4794-aa38-f3c060444d4c"
 					}
 				},
-				"type": "TumblingWindowTrigger",
-				"typeProperties": {
-					"frequency": "Hour",
-					"interval": 1,
-					"startTime": "2025-06-03T09:59:00Z",
-					"delay": "00:00:00",
-					"maxConcurrency": 50,
-					"retryPolicy": {
-						"intervalInSeconds": 30
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
 					},
-					"dependsOn": []
-				}
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/56f50f90-f8ef-4179-9146-b3fdf441cfd6/resourceGroups/jun25ASA/providers/Microsoft.Synapse/workspaces/nju2usynanajun25/bigDataPools/demopool",
+						"name": "demopool",
+						"type": "Spark",
+						"endpoint": "https://nju2usynanajun25.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/demopool",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Demo notebook\n",
+							"\n",
+							"This is a **stupid** demo\n",
+							"\n",
+							"$$\\sum_{i=0}^{10} i^2$$"
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## simple math"
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"1+1"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## a bit of SQL"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "sparksql"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%sql\n",
+							"SELECT 1 +1"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"ms_comments": [
+								{
+									"threadId": "9f15c245-2b67-4861-a7dd-86fc5d610702",
+									"text": "what is this?",
+									"status": "active",
+									"user": {
+										"name": "Nico Jacobs",
+										"idType": "aad"
+									},
+									"createdDateUTC": 1749133393268,
+									"modifiedDateUTC": 1749133393268,
+									"replies": [
+										{
+											"replyId": "06debb1d-da53-405b-b300-fef96a1af067",
+											"text": "you must grab this from",
+											"user": {
+												"name": "Nico Jacobs",
+												"idType": "aad"
+											},
+											"createdDateUTC": 1749133416488,
+											"modifiedDateUTC": 1749133416488
+										}
+									]
+								}
+							],
+							"ms_comment_ranges": {
+								"9f15c245-2b67-4861-a7dd-86fc5d610702": {
+									"text": "our linked service name",
+									"start": {
+										"line": 8,
+										"column": 25
+									},
+									"end": {
+										"line": 8,
+										"column": 48
+									}
+								}
+							}
+						},
+						"source": [
+							"from pyspark.sql import SparkSession \n",
+							"from pyspark.sql.types import * \n",
+							"        \n",
+							"# Azure storage access info \n",
+							"blob_account_name = 'Your blob name' # replace with your blob name \n",
+							"blob_container_name = 'Your container name' # replace with your container name \n",
+							"blob_relative_path = 'Your relative path' # replace with your relative folder path \n",
+							"linked_service_name = 'Your linked service name' # replace with your linked service name \n",
+							"        \n",
+							"blob_sas_token = mssparkutils.credentials.getConnectionStringOrCreds(linked_service_name) \n",
+							"        \n",
+							"# Allow SPARK to access from Blob remotely \n",
+							"wasbs_path = 'wasbs://%s@%s.blob.core.windows.net/%s' % (blob_container_name, blob_account_name, blob_relative_path) \n",
+							"spark.conf.set('fs.azure.sas.%s.%s.blob.core.windows.net' % (blob_container_name, blob_account_name), blob_sas_token) \n",
+							"print('Remote blob path: ' + wasbs_path) \n",
+							"        \n",
+							"# Read a csv file \n",
+							"csv_path = wasbs_path + 'Your file name ' \n",
+							"df_csv = spark.read.csv(csv_path, header = 'true') \n",
+							"        \n",
+							"# Read a parquet file \n",
+							"parquet_path = wasbs_path + ' Your file name ' \n",
+							"df_parquet = spark.read.parquet(parquet_path) \n",
+							"        \n",
+							"# Read a json file \n",
+							"json_path = wasbs_path + 'Your file name ' \n",
+							"df_json = spark.read.json(json_path) "
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
 			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/copy chicken data')]"
-			]
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/helpernb')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "demopool",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "bd178769-1471-42ad-a4fb-1486d6740b10"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/56f50f90-f8ef-4179-9146-b3fdf441cfd6/resourceGroups/jun25ASA/providers/Microsoft.Synapse/workspaces/nju2usynanajun25/bigDataPools/demopool",
+						"name": "demopool",
+						"type": "Spark",
+						"endpoint": "https://nju2usynanajun25.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/demopool",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"myfavnr = 42"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"def somemath(i,j):\n",
+							"    return i+j"
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/demopool')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": false,
+					"maxNodeCount": 70,
+					"minNodeCount": 3
+				},
+				"nodeCount": 3,
+				"nodeSize": "Small",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.4",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "swedencentral"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/mydemopool')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "swedencentral"
 		}
 	]
 }
